@@ -14,7 +14,13 @@ const MessageBar = () => {
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const emojiRef = useRef();
   const fileInputRef = useRef();
-  const { selectedChatType, selectedChatData, userInfo, setIsUploading, setFileUploadProgress } = useAppStore();
+  const {
+    selectedChatType,
+    selectedChatData,
+    userInfo,
+    setIsUploading,
+    setFileUploadProgress,
+  } = useAppStore();
   const socket = useSocket();
 
   useEffect(() => {
@@ -42,8 +48,7 @@ const MessageBar = () => {
         messageType: "text",
         fileUrl: undefined,
       });
-    }
-    else if( selectedChatType === "channel"){
+    } else if (selectedChatType === "channel") {
       socket.emit("send-channel-message", {
         sender: userInfo.id,
         content: message,
@@ -53,10 +58,10 @@ const MessageBar = () => {
       });
     }
     setMessage("");
-  }
+  };
 
   const handleSendFile = async () => {
-    if(fileInputRef.current){
+    if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
@@ -70,16 +75,16 @@ const MessageBar = () => {
         setIsUploading(true);
         const res = await apiClient.post(FILE_UPLOAD_ROUTE, formData, {
           withCredentials: true,
-          // headers: { 
+          // headers: {
           //   "Content-Type": "multipart/form-data",
           // },
-          onUploadProgress: data => {
-            setFileUploadProgress(Math.round(100 * data.loaded) / data.total)
-          }
+          onUploadProgress: (data) => {
+            setFileUploadProgress(Math.round(100 * data.loaded) / data.total);
+          },
         });
         if (res.status === 200) {
           setIsUploading(false);
-          if(selectedChatType === "contact"){
+          if (selectedChatType === "contact") {
             socket.emit("sendMessage", {
               sender: userInfo.id,
               content: message,
@@ -88,7 +93,7 @@ const MessageBar = () => {
               fileUrl: res.data.filePath,
             });
           }
-        } else if (selectedChatType === "channel"){
+        } else if (selectedChatType === "channel") {
           socket.emit("send-channel-message", {
             sender: userInfo.id,
             content: undefined,
@@ -96,7 +101,6 @@ const MessageBar = () => {
             fileUrl: res.data.filePath,
             channelId: selectedChatData._id,
           });
-
         }
       }
     } catch (error) {
@@ -115,14 +119,17 @@ const MessageBar = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
-            if(e.key === "Enter" && !e.shiftKey){
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               handleSendMessage();
             }
           }}
         />
         <div className="relative">
-          <button className="text-gray-400 hover:text-white transition-all duration-300" onClick={handleSendFile}>
+          <button
+            className="text-gray-400 hover:text-white transition-all duration-300"
+            onClick={handleSendFile}
+          >
             <GrAttachment size={24} />
           </button>
           <input

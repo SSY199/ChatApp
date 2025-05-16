@@ -17,7 +17,11 @@ import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import apiClient from "@/lib/api-client.js";
-import { CREATE_CHANNELS_ROUTES, GET_ALL_CONTACTS_ROUTES, SEARCH_CONTACTS_ROUTES } from "@/utils/constants.js";
+import {
+  CREATE_CHANNELS_ROUTES,
+  GET_ALL_CONTACTS_ROUTES,
+  SEARCH_CONTACTS_ROUTES,
+} from "@/utils/constants.js";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { HOST } from "@/utils/constants.js";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -27,7 +31,6 @@ import { Button } from "@/components/ui/button";
 import MultipleSelector from "@/components/ui/multipleselect";
 
 const CreateChannel = () => {
-
   const { addChannel } = useAppStore();
   const [newChannelModal, setNewChannelModal] = useState(false);
   const [allContacts, setAllContacts] = useState([]);
@@ -44,18 +47,22 @@ const CreateChannel = () => {
       setAllContacts(res.data.contacts);
     };
     data();
-  }, [])
+  }, []);
 
-  const createChannel = async() => {
+  const createChannel = async () => {
     try {
-      if(channelName.length > 0 && selectedContacts.length > 0) {
-        const response = await apiClient.post(CREATE_CHANNELS_ROUTES, {
-          name: channelName,
-          members: selectedContacts.map((contact) => contact.value),
-        }, {
-          withCredentials: true,
-        });
-        if(response.status === 200) {
+      if (channelName.length > 0 && selectedContacts.length > 0) {
+        const response = await apiClient.post(
+          CREATE_CHANNELS_ROUTES,
+          {
+            name: channelName,
+            members: selectedContacts.map((contact) => contact.value),
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 201) {
           setChannelName("");
           setSelectedContacts([]);
           addChannel(response.data.channel);
@@ -65,15 +72,11 @@ const CreateChannel = () => {
           setSelectedContacts([]);
           setNewChannelModal(false);
         }
-
       }
-      
     } catch (error) {
       console.error("Error creating channel:", error);
-
     }
-
-  }
+  };
 
   // const searchContact = async (searchTerm) => {
   //   try {
@@ -83,7 +86,7 @@ const CreateChannel = () => {
   //       }, {
   //         withCredentials: true,
   //       });
-        
+
   //       if(response.status === 200) {
   //         setSearchedContacts(response.data.contacts);
   //       } else {
@@ -93,8 +96,7 @@ const CreateChannel = () => {
   //   } catch (error) {
   //     console.error("Error fetching contacts:", error);
   //   }
-  // } 
-
+  // }
 
   // const selectNewContact = async (contact) => {
   //   try {
@@ -107,7 +109,7 @@ const CreateChannel = () => {
   //     // }, {
   //     //   withCredentials: true,
   //     // });
-      
+
   //     // if(response.status === 200) {
   //     //   setSearchedContacts(response.data.contacts);
   //     // } else {
@@ -153,20 +155,32 @@ const CreateChannel = () => {
             />
           </div>
           <div className="">
-            <MultipleSelector className="rounded-lg bg-[#2c2e3b] border-none py-2 text-white" defaultOptions={allContacts} placeholder="Search Contacts" value={selectedContacts} onChange={setSelectedContacts} emptyIndicator={
-              <p className="text-center text-lg leading-10 text-gray-600"> No results found.</p>
-            } />
+            <MultipleSelector
+              className="rounded-lg bg-[#2c2e3b] border-none py-2 text-white"
+              defaultOptions={allContacts}
+              placeholder="Search Contacts"
+              value={selectedContacts}
+              onChange={setSelectedContacts}
+              emptyIndicator={
+                <p className="text-center text-lg leading-10 text-gray-600">
+                  {" "}
+                  No results found.
+                </p>
+              }
+            />
           </div>
           <div className="">
-            <Button className='w-full bg-purple-700 hover:bg-purple-900 transition-all duration-300' onClick={createChannel}>
+            <Button
+              className="w-full bg-purple-700 hover:bg-purple-900 transition-all duration-300"
+              onClick={createChannel}
+            >
               Create Channel
             </Button>
           </div>
-          
         </DialogContent>
       </Dialog>
     </div>
   );
-}
+};
 
-export default CreateChannel      
+export default CreateChannel;

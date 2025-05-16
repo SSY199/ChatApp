@@ -1,44 +1,48 @@
 import mongoose from "mongoose";
 
-const channelSchema = new mongoose.Schema(
-  {
-    name: { type: String,
-       required: true
-       },
-    members: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-    ],
-    admin: {
+const channelSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  members: [
+    {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
-      },
-    ],
-    deletedAt: {
-      type: Date,
-      default: null,
-    },
+  ],
+  admin: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
-  {
-    timestamps: true, // automatically adds createdAt and updatedAt
-  }
-);
+  messages: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+    },
+  ],
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-// channelSchema.pre("validate", function(next) {
-//   if (!this.members.includes(this.admin)) {
-//     this.invalidate("admin", "Admin must be a member of the channel");
-//   }
-//   next();
-// });
+channelSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+channelSchema.pre("findOneAndUpdate", function (next) {
+  this.set({ updatedAt: Date.now() });
+  next();
+});
 
 const Channel = mongoose.model("Channel", channelSchema);
 

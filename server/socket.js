@@ -47,7 +47,7 @@ export const setupSocket = (server) => {
 
   const sendChannelMessage = async (message) => {
     const { channelId, sender, content, messageType, fileUrl } = message;
-  
+
     try {
       const createdMessage = await Message.create({
         sender,
@@ -57,18 +57,18 @@ export const setupSocket = (server) => {
         timestamp: new Date(),
         fileUrl,
       });
-  
+
       const messageData = await Message.findById(createdMessage._id)
         .populate("sender", "id email firstName lastName image color")
         .exec();
-  
+
       // First check if channel exists
       const channel = await Channel.findById(channelId).populate("members");
       if (!channel) {
         console.error(`Channel not found with ID: ${channelId}`);
         return; // Exit if channel doesn't exist
       }
-  
+
       await Channel.findByIdAndUpdate(
         channelId,
         {
@@ -78,19 +78,19 @@ export const setupSocket = (server) => {
         },
         { new: true }
       );
-  
+
       const finalData = { ...messageData._doc, channelId: channel._id };
-  
+
       // Send to members
       if (channel.members) {
-        channel.members.forEach(member => {
+        channel.members.forEach((member) => {
           const memberSocketId = userSocketMap.get(member._id.toString());
           if (memberSocketId) {
             io.to(memberSocketId).emit("receive-channel-message", finalData);
           }
         });
       }
-  
+
       // Send to admin if exists
       if (channel.admin) {
         const adminSocketId = userSocketMap.get(channel.admin._id.toString());

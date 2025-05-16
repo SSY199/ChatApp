@@ -69,7 +69,7 @@ const ContactList = ({ contacts, isChannel }) => {
                 
             }
             {
-                  isChannel ? <span>{contact.name}</span> : <span>{`${contact.firstName} ${contact.lastName}`}</span>
+                  isChannel ? <span>{contact.name}</span> : (<span>{contact.firstName  ? `${contact.firstName} ${contact.lastName}` : contact.email}</span>)
                 }
           </div>
         </div>
