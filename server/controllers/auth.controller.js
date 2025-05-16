@@ -1,7 +1,7 @@
 import User from "../models/auth.model.js";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-import { compare } from "bcrypt";
+import { compare } from "bcryptjs";
 import { renameSync, unlinkSync } from "fs";
 
 const maxAge = 3 * 24 * 60 * 60;
