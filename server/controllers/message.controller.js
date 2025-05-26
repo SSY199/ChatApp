@@ -28,12 +28,12 @@ export const getMessages = async (req, res) => {
 
 export const uploadFile = async (req, res, next) => {
   try {
-    if(!req.file){
+    if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
     
     const date = Date.now();
-    let fileDir = `uploads/files/${date}`
+    let fileDir = `uploads/files/${date}`;
     let fileName = `${fileDir}/${req.file.originalname}`;
 
     mkdirSync(fileDir, { recursive: true });
@@ -43,10 +43,8 @@ export const uploadFile = async (req, res, next) => {
       message: "File uploaded successfully",
       filePath: fileName,
     });
-
-    
   } catch (error) {
     console.log("Error uploading file:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};

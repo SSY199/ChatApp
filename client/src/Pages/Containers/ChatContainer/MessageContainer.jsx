@@ -2,7 +2,11 @@ import React, { useRef, useEffect, useState } from "react";
 import { useAppStore } from "@/store/store.js";
 import moment from "moment";
 import apiClient from "@/lib/api-client.js";
-import { GET_CHANNEL_MESSAGES_ROUTES, GET_MESSAGES_ROUTES, HOST } from "@/utils/constants.js";
+import {
+  GET_CHANNEL_MESSAGES_ROUTES,
+  GET_MESSAGES_ROUTES,
+  HOST,
+} from "@/utils/constants.js";
 import { MdFolderZip } from "react-icons/md";
 import { FiDownload } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
@@ -30,10 +34,10 @@ const MessageContainer = () => {
         const response = await apiClient.post(
           GET_MESSAGES_ROUTES,
           {
-            id: selectedChatData._id
+            id: selectedChatData._id,
           },
           {
-            withCredentials: true
+            withCredentials: true,
           }
         );
         if (response.data.messages) {
@@ -49,7 +53,7 @@ const MessageContainer = () => {
         const response = await apiClient.get(
           `${GET_CHANNEL_MESSAGES_ROUTES}/${selectedChatData._id}`,
           {
-            withCredentials: true
+            withCredentials: true,
           }
         );
         if (response.data.messages) {
@@ -60,11 +64,11 @@ const MessageContainer = () => {
       }
     };
 
-      if (selectedChatType === "contact") {
-        getMessages();
-      } else if (selectedChatType === "channel") {
-        getChannelMessages();
-      }
+    if (selectedChatType === "contact") {
+      getMessages();
+    } else if (selectedChatType === "channel") {
+      getChannelMessages();
+    }
   });
 
   const isAtBottom = () => {
@@ -185,12 +189,12 @@ const MessageContainer = () => {
 
   const renderChannelMessages = (message) => {
     const isCurrentUser = message.sender._id === userInfo.id;
-    const senderInitial = message.sender.firstName 
+    const senderInitial = message.sender.firstName
       ? message.sender.firstName.charAt(0).toUpperCase()
       : message.sender.email.charAt(0).toUpperCase();
 
     return (
-      <div 
+      <div
         className={`my-5 ${isCurrentUser ? "text-right" : "text-left"}`}
         key={`channel-${message._id}`}
       >
@@ -206,16 +210,18 @@ const MessageContainer = () => {
                 />
               )}
               <AvatarFallback
-                className={`uppercase h-8 w-8 font-bold text-sm border flex items-center justify-center rounded-full ${
-                  getColor(message.sender.color || "gray")
-                }`}
+                className={`uppercase h-8 w-8 font-bold text-sm border flex items-center justify-center rounded-full ${getColor(
+                  message.sender.color || "gray"
+                )}`}
                 aria-label="User Initial"
               >
                 {senderInitial}
               </AvatarFallback>
             </Avatar>
             <span className="text-sm text-white/60">
-              {`${message.sender.firstName || ""} ${message.sender.lastName || ""}`.trim()}
+              {`${message.sender.firstName || ""} ${
+                message.sender.lastName || ""
+              }`.trim()}
             </span>
           </div>
         )}
@@ -312,7 +318,7 @@ const MessageContainer = () => {
 
   return (
     <div className="flex-1 p-4 px-6 md:px-8 md:w-[65vw] lg:w-[70vw] xl:w-[80vw] w-full relative h-full">
-      <div 
+      <div
         ref={containerRef}
         className="absolute inset-0 overflow-y-auto scrollbar-hide px-2 pb-4"
       >

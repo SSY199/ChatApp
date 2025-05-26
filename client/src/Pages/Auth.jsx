@@ -23,7 +23,7 @@ const Auth = () => {
       toast.error("Email and Password are required!");
       return false;
     }
-    if(!email.length) {
+    if (!email.length) {
       toast.error("Email is required!");
       return false;
     }
@@ -35,57 +35,58 @@ const Auth = () => {
       toast.error("Password must be at least 5 characters long!");
       return false;
     }
-    if(!password.length) {
+    if (!password.length) {
       toast.error("Password is required!");
       return false;
     }
     return true;
-  }
+  };
 
   const validateLogin = () => {
     if (!email.length && !password.length) {
       toast.error("Email and Password are required!");
       return false;
     }
-    if(!email.length) {
+    if (!email.length) {
       toast.error("Email is required!");
       return false;
     }
-    if(!password.length) {
+    if (!password.length) {
       toast.error("Password is required!");
       return false;
     }
     return true;
-  }
+  };
 
-  const handleLogin = async () => {
-    if (validateLogin()) {
-      try {
-        const res = await apiClient.post(
-          LOGIN_ROUTES,
-          { email, password },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        
-        if(res.status === 200) {
-          toast.success("Login successful!");
-        if(res.data.user.profileSetup) {
-          console.log("User info received:", res.data.user);
+const handleLogin = async () => {
+  if (validateLogin()) {
+    try {
+      const res = await apiClient.post(
+        LOGIN_ROUTES,
+        { email, password },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Login successful!");
+        if (res.data.user.profileSetup) {
           setUserInfo(res.data.user);
           navigate("/chat");
         } else {
           navigate("/profile");
         }
       }
-      console.log(res.data);
     } catch (err) {
-        console.error("Login error:", err.response?.data || err.message);
-      }
+      const message = err.response?.data?.message || "An unexpected error occurred";
+      console.error("Login error:", message);
+      toast.error(message);
     }
-  };
+  }
+};
+
 
   const handleSignup = async () => {
     if (validateSignup()) {
@@ -103,7 +104,7 @@ const Auth = () => {
           console.log("User info received:", res.data.user);
           setUserInfo(res.data.user);
           toast.success("Signup successful! Please complete your profile.");
-          navigate("/profile"); 
+          navigate("/profile");
         }
       } catch (err) {
         console.error("Signup error:", err.response?.data || err.message);
@@ -111,7 +112,6 @@ const Auth = () => {
       }
     }
   };
-  
 
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">

@@ -2,20 +2,28 @@ import React, { useEffect } from "react";
 import ProfileInfo from "./ChatContainer/ProfileInfo";
 import NewDm from "./ChatContainer/NewDm";
 import apiClient from "@/lib/api-client.js";
-import { GET_CHANNELS_ROUTES, GET_CONTACTS_FOR_DM_ROUTES } from "@/utils/constants";
+import {
+  GET_CHANNELS_ROUTES,
+  GET_CONTACTS_FOR_DM_ROUTES,
+} from "@/utils/constants";
 import ContactList from "./ChatContainer/ContactList";
 import { useAppStore } from "@/store/store.js";
 import CreateChannel from "../Channel/CreateChannel";
 
 const ContactContainers = () => {
-  const { directMessagesContacts, setDirectMessagesContacts, channels, setChannels } = useAppStore();
+  const {
+    directMessagesContacts,
+    setDirectMessagesContacts,
+    channels,
+    setChannels,
+  } = useAppStore();
 
   useEffect(() => {
     const getContacts = async () => {
       const response = await apiClient.get(GET_CONTACTS_FOR_DM_ROUTES, {
         withCredentials: true,
       });
-      if(response.data.contacts){
+      if (response.data.contacts) {
         setDirectMessagesContacts(response.data.contacts);
       }
     };
@@ -23,7 +31,7 @@ const ContactContainers = () => {
       const response = await apiClient.get(GET_CHANNELS_ROUTES, {
         withCredentials: true,
       });
-      if(response.data.channels){
+      if (response.data.channels) {
         setChannels(response.data.channels);
       }
     };
@@ -86,18 +94,9 @@ const Logo = () => {
         xmlns="http://www.w3.org/2000/svg"
         className="w-10 md:w-12"
       >
-        <path
-          d="M55.5 0H77.5L58.5 32H36.5L55.5 0Z"
-          fill="#8383ec"
-        />
-        <path
-          d="M35.5 0H51.5L32.5 32H16.5L35.5 0Z"
-          fill="#975aed"
-        />
-        <path
-          d="M19.5 0H31.5L12.5 32H0.5L19.5 0Z"
-          fill="#a16ee8"
-        />
+        <path d="M55.5 0H77.5L58.5 32H36.5L55.5 0Z" fill="#8383ec" />
+        <path d="M35.5 0H51.5L32.5 32H16.5L35.5 0Z" fill="#975aed" />
+        <path d="M19.5 0H31.5L12.5 32H0.5L19.5 0Z" fill="#a16ee8" />
       </svg>
       <span className="text-xl md:text-2xl font-semibold text-white drop-shadow-md hover:text-purple-500 transition-colors duration-300">
         Synchronous

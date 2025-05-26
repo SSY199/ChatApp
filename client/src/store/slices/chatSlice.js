@@ -68,6 +68,10 @@ export const createChatSlice = (set, get) => ({
     const channels = get().channels;
     set({channels: [channel, ...channels]});
   },
+  removeChannel: (channelId) => set((state) => ({
+  channels: state.channels.filter((c) => c._id !== channelId),
+})),
+
 
   addChannelInList: (message) => {
     const channels = get().channels;

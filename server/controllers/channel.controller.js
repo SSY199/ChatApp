@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/auth.model.js";
 import Channel from "../models/channel.model.js";
+import Message from "../models/contact.model.js";
 
 export const createChannel = async (req, res, next) => {
   try {
@@ -62,3 +63,24 @@ export const getChannelMessages = async (req, res, next) => {
   }
 };
 
+export const deleteChannel = async (req, res, next) => {
+  try {
+    const { channelId } = req.params;
+    const userId = req.userId;
+
+    const channel = await Channel.findById(channelId);
+    if (!channel) {
+      return res.status(404).json({ message: "Channel not found" });
+    }
+    if (channel.admin.toString() !== userId) {
+      return res.status(403).json({ message: "You are not authorized to delete this channel" });
+    }
+    await Message.deleteMany({ _id: { $in: channel.messages } });
+    await Channel.findByIdAndDelete(channelId);
+    return res.status(200).json({ message: "Channel deleted successfully" });
+  }
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+}

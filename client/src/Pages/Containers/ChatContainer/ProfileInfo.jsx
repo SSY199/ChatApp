@@ -10,12 +10,30 @@ import { IoLogOut } from "react-icons/io5";
 import { toast } from "sonner";
 import apiClient from "@/lib/api-client.js";
 import { LOGOUT_ROUTE } from "@/utils/constants.js";
+import { useState, useRef, useEffect } from "react";
+import { FaUserEdit, FaSignOutAlt, FaUserSlash, FaCog } from "react-icons/fa";
+
 
 //import { Navigate } from "react-router-dom";
 
 const ProfileInfo = () => {
+  const [openSettings, setOpenSettings] = useState(false);
+  const dropdownRef = useRef();
   const { userInfo, setUserInfo } = useAppStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenSettings(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
 
   const handleLogout = async () => {
     try {
@@ -32,6 +50,22 @@ const ProfileInfo = () => {
       toast.error("An error occurred while logging out");
     }
   };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const res = await apiClient.delete("/api/auth/delete-account", { withCredentials: true });
+      if (res.status === 200) {
+        setUserInfo(null);
+        navigate("/auth");
+        toast.success("Account deleted successfully");
+      } else {
+        toast.error("Error deleting account");
+      }
+    } catch (error) {
+      console.error("Delete account error:", error);
+      toast.error("An error occurred while deleting the account");
+    }
+  }
 
   return (
     <div className="h-16 flex items-center justify-between px-4 w-full bg-[#2a2b33]">
@@ -63,18 +97,39 @@ const ProfileInfo = () => {
           </span>
         </div>
       </div>
-      <div className="flex gap-4">
-        <FaEdit
-          className="text-white text-xl cursor-pointer hover:text-purple-500 transition duration-300"
-          onClick={() => navigate("/profile")}
+       <div className="relative" ref={dropdownRef}>
+        <FaCog
+          className="text-white text-2xl cursor-pointer hover:text-purple-400 transition"
+          onClick={() => setOpenSettings(!openSettings)}
         />
-        <IoLogOut
-          className="text-white text-2xl cursor-pointer hover:text-red-500 transition duration-300"
-          onClick={handleLogout}
-        />
+        {openSettings && (
+          <div className="absolute right-0 bottom-14 w-48 bg-[#1e1f26] rounded shadow-lg z-50 p-2 transition-all duration-200 ease-out">
+
+            <button
+              onClick={() => navigate("/profile")}
+              className="flex items-center w-full px-3 py-2 text-white hover:bg-[#333] rounded"
+            >
+              <FaEdit className="mr-2" />
+              Edit Profile
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-3 py-2 text-white hover:bg-[#333] rounded"
+            >
+              <FaSignOutAlt className="mr-2" />
+              Logout
+            </button>
+            <button
+              onClick={handleDeleteAccount}
+              className="flex items-center w-full px-3 py-2 text-red-500 hover:bg-[#333] rounded"
+            >
+              <FaUserSlash className="mr-2" />
+              Delete Account
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
 export default ProfileInfo;

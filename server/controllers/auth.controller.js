@@ -2,7 +2,7 @@ import User from "../models/auth.model.js";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { compare } from "bcryptjs";
-import { renameSync, unlinkSync } from "fs";
+import { renameSync, unlinkSync, existsSync } from "fs";
 
 const maxAge = 3 * 24 * 60 * 60;
 
@@ -35,7 +35,7 @@ export const signup = async (req, res) => {
       sameSite: "None",
       secure: true,
     });
-    
+
     return res.status(201).json({
       message: "User created successfully",
       user: {
@@ -50,7 +50,6 @@ export const signup = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -61,7 +60,7 @@ export const login = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "User not found" });
     }
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
@@ -73,7 +72,7 @@ export const login = async (req, res) => {
       sameSite: "None",
       secure: true,
     });
-    
+
     return res.status(200).json({
       message: "Login successful",
       user: {
@@ -90,7 +89,7 @@ export const login = async (req, res) => {
     console.error("Error during login:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const getUserInfo = async (req, res) => {
   try {
@@ -115,13 +114,15 @@ export const getUserInfo = async (req, res) => {
     console.error("Error fetching user info:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, color } = req.body;
     if (!firstName && !lastName) {
-      return res.status(400).json({ message: "First name and last name are required" });
+      return res
+        .status(400)
+        .json({ message: "First name and last name are required" });
     }
     if (!firstName) {
       return res.status(400).json({ message: "First name is required" });
@@ -138,7 +139,7 @@ export const updateProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     return res.status(200).json({
       message: "Profile updated successfully",
       user: {
@@ -155,10 +156,10 @@ export const updateProfile = async (req, res) => {
     console.error("Error updating profile:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const updateProfileImage = async (req, res) => {
-  if(!req.file){
+  if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
   const date = Date.now();
@@ -181,7 +182,7 @@ export const updateProfileImage = async (req, res) => {
       image: updatedUser.image,
     },
   });
-}
+};
 
 export const deleteProfileImage = async (req, res) => {
   const user = await User.findById(req.userId);
@@ -205,7 +206,7 @@ export const deleteProfileImage = async (req, res) => {
       image: user.image,
     },
   });
-}
+};
 
 export const logout = async (req, res) => {
   try {
@@ -215,4 +216,21 @@ export const logout = async (req, res) => {
     console.error("Error during logout:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.image && existsSync(user.image)) {
+      unlinkSync(user.image);
+    }
+    res.cookie("jwt", "", { maxAge: 1, secure: true, sameSite: "None" });
+    return res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
